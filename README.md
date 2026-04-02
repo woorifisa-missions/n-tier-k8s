@@ -268,8 +268,10 @@ kubectl apply -f ingress.yaml
 ## 6. 결과 화면
 
 ### `kubectl get all -o wide`로 생성된 객체 확인
+<img width="1675" height="677" alt="getall" src="https://github.com/user-attachments/assets/cb96047b-ee24-496c-9de1-9a9d6aec0dd3" />
 
 ### spring boot와 mysql 통신 확인
+<img width="955" height="80" alt="curl" src="https://github.com/user-attachments/assets/fa8f16f2-5a10-4c32-b5cc-ddf0938e0f94" />
 
 ## 7. 트러블 슈팅
 
@@ -278,6 +280,7 @@ kubectl apply -f ingress.yaml
 
 - minikube 환경에서는 ingress addon과 위의 ingress.yaml 스크립트 만으로 ingress 통신이 가능했다.
 - 그러나 본 실습 환경(직접 구성한 VM 기반 클러스터)에서는 `ingress-nginx-controller` Service가 `LoadBalancer` 타입인데 실제 실습 환경(베어메탈)에 로드밸런싱 제공자가 없어 `EXTERNAL-IP`가 `pending` 상태로 남아 외부 진입 주소가 자동 생성되지 않았다.
+<img width="1845" height="296" alt="trouble" src="https://github.com/user-attachments/assets/75fc267a-6322-4354-952d-aed878db634f" />
 
 
 - AWS ALB/NLB와 같은 로드밸런서를 사용하거나 MetalB를 사용하여 이러한 문제를 해결할 수 있지만 본 실습에서는 생략하였다.
