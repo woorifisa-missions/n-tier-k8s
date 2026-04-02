@@ -1,0 +1,58 @@
+# 1. 자바 애플리케이션 배포 (Deployment)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app-deployment
+spec:
+  replicas: 2 # 가용성을 위해 레플리카 2개 설정
+  selector:
+    matchLabels:
+      app: springboot-app
+  template:
+    metadata:
+      labels:
+        app: springboot-app
+    spec:
+      containers:
+      - name: springboot-app
+        image: zaixian5/springboot-app:latest # 도커 허브 이미지 주소
+        ports:
+        - containerPort: 8080 # 스프링 부트 기본 포트
+
+        # DB 연결 정보 (application.properties의 ${...} 자리표시자와 매칭)
+        # env:
+        #   - name: MYSQL_HOST
+        #     value: "mysql-service"
+        #   - name: MYSQL_PORT
+        #     value: "3306"
+        #   - name: MYSQL_DATABASE
+        #     value: "fisa"
+        #   - name: MYSQL_USER
+        #     value: "root"
+        #   - name: MYSQL_PASSWORD
+
+        envFrom: # DB 연결 정보를 configmap으로 분리
+          - configMapRef:
+              name: app-config
+        env:
+          - name: MYSQL_PASSWORD
+            value: "root" # 비밀번호는 Secret으로 분리 권장 (여기서는 그대로 둠)
+
+---
+
+# 2. 외부에서 웹 접속을 위한 설정 (Service)
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-app-service
+spec:
+  selector:
+    app: springboot-app
+  ports:
+    - protocol: TCP
+      port: 80          # 서비스의 포트 (브라우저 접속용)
+      targetPort: 8080  # 컨테이너 안의 스프링 포트
+      nodePort: 30000   # ClusterIP룰 사용할 경우 삭제할 것
+  type: NodePort # 외부 브라우저에서 접속하기 위해 NodePort로 설정(테스트 용)
+  # type: ClusterIP # ingress로 접속하려면 이 서비스를 내부 클러스터에서만 접속 가능한 ClusterIP로 설정해야 함

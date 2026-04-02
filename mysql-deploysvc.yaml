@@ -1,0 +1,44 @@
+# 1. MySQL 배포 설정 (Deployment)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql
+spec:
+  replicas: 1 # DB는 데이터 동기화 문제로 보통 1개로 시작
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0 # 사용할 MySQL 버전 이미지
+        ports:
+        - containerPort: 3306 # MySQL 기본 포트
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root" # 실제 운영 시에는 'Secret'을 사용해야 하지만, 여기선 직접 입력
+        - name: MYSQL_DATABASE
+          value: "fisa" # 시작 시 자동으로 생성할 DB 이름
+
+---
+
+# 2. MySQL 접속 설정 (Service)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306      # 서비스가 노출할 포트
+      targetPort: 3306 # 컨테이너로 전달할 포트
+  type: ClusterIP # 클러스터 내부에서만 접근 가능하도록 설정
